@@ -10,7 +10,7 @@ from sklearn.cluster import KMeans
 
 # data settings
 names = ['AIDS']
-names = ['PROTEINS', 'PROTEINS_full']
+# names = ['PROTEINS', 'PROTEINS_full']
 # names = ['BZR']
 # # names = ['COX2']
 # # names = ['DHFR']
