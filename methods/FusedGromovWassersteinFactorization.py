@@ -103,8 +103,6 @@ class FGWF(nn.Module):
             self.embeddings = nn.ParameterList()
             base_label = []
             for k in range(self.num_atoms):
-                print("\nINDEX SAMPLES: ", index_samples)
-                print("K:", k, "\n")
                 idx = index_samples[k]
                 data = prior.__getitem__(idx)
                 graph = data[0]
