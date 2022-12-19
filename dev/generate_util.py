@@ -29,7 +29,7 @@ def gen_star_graph(n: int, permute = False, verbose = False):
         adj_matrix[source, source] = 0
         return adj_matrix 
 
-def random_generate(gen_funcs, max_nodes, num_graphs, permute = False): 
+def random_generate(gen_funcs, min_nodes, max_nodes, num_graphs, permute = False): 
         """
         Randomly generates <num_graphs> with each generator function in <gen_funcs>
         and populate it in a dictionary where the keys are the ID of the generator 
@@ -46,7 +46,7 @@ def random_generate(gen_funcs, max_nodes, num_graphs, permute = False):
         # detrermine the number of classes 
         num_classes = len(gen_funcs)
         # pre-generate the number of nodes every graph should have 
-        num_nodes = np.random.randint(1, max_nodes, num_graphs * num_classes)
+        num_nodes = np.random.randint(min_nodes, max_nodes, num_graphs * num_classes)
         i = 0 
         # for every class, populate the dictionary at slot value <class_id>
         # with <num_graphs> number of graphs using its associated generator

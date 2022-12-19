@@ -1,8 +1,9 @@
 from dev import generate_util as gen
 
 GENERATIVE_FUNCS = [gen.gen_cycle_graph, gen.gen_star_graph]
-MAX_NODE = 35
-NUM_GRAPHS = 10
+MIN_NODE = 20
+MAX_NODE = 100
+NUM_GRAPHS = 500
 PERMUTE = False 
 
 
@@ -22,7 +23,7 @@ PERMUTE = False
 #     print("----------------------------------------- \n")
 
 # Generate star and cycle graphs 
-graph_dict = gen.random_generate(GENERATIVE_FUNCS, MAX_NODE, NUM_GRAPHS, PERMUTE)
+graph_dict = gen.random_generate(GENERATIVE_FUNCS, MIN_NODE, MAX_NODE, NUM_GRAPHS, PERMUTE)
 gen.graph2text(graph_dict, "Cycles_and_Stars", del_existing = True)
 
 
