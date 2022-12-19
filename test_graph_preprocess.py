@@ -2,7 +2,7 @@ import dev.util as util
 import os
 import pickle
 
-name_datasets = ['Cycles_and_Stars']  # util.navigate_child_dirs(util.DATA_GRAPH_DIR)
+name_datasets = ['IDENTICAL-STARS-CYCLES']  # util.navigate_child_dirs(util.DATA_GRAPH_DIR)
 
 for name in name_datasets:
     filename_edges = os.path.join(util.DATA_GRAPH_DIR, name, '{}_A.txt'.format(name))
@@ -30,6 +30,7 @@ for name in name_datasets:
         label = int(labels[n].strip("\n"))
         labels[n] = label
 
+    # Set up a mapping from labels to indices of the label
     label2idx = {}
     idx = 0
     for n in range(len(labels)):
@@ -38,21 +39,18 @@ for name in name_datasets:
             idx += 1
     num_class = len(label2idx)
 
+    # Set up a mapping from graph ID to node ID, and vice versa
     graph2node = {}
     node2graph = {}
     for i in range(len(graphs)):
-        node_id = i + 1
+        node_id = i + 1 # add one to correct for starting idx = 0
         graph_id = graphs[i]
         node2graph[node_id] = graph_id
-
+        # if the graph ID is not populated already, initialize to empty dict
         if graph_id not in graph2node.keys():
             graph2node[graph_id] = {}
-            idx = len(graph2node[graph_id])
-            graph2node[graph_id][node_id] = idx
-        else:
-            # graph2node[graph_id].append(node_id)
-            idx = len(graph2node[graph_id])
-            graph2node[graph_id][node_id] = idx
+        idx = len(graph2node[graph_id])
+        graph2node[graph_id][node_id] = idx
 
     graph2size = {}
     ave_node_size = 0
@@ -65,7 +63,6 @@ for name in name_datasets:
     for m in range(len(edges)):
         src = edges[m][0]
         dst = edges[m][1]
-        # print(edges[m], src, dst)
         graph_id = node2graph[src]
         src_id = graph2node[graph_id][src]
         dst_id = graph2node[graph_id][dst]

@@ -9,7 +9,7 @@ from sklearn.cluster import KMeans
 
 
 # data settings
-names = ['Cycles_and_Stars']
+names = ['IDENTICAL-STARS-CYCLES']
 
 
 # model params
