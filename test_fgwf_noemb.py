@@ -13,7 +13,7 @@ names = ['Cycles_and_Stars']
 
 
 # model params
-num_atoms = 10
+num_atoms = 2
 size_atoms = num_atoms * [20]
 ot_method = 'ppa'
 # ot_method = 'b-admm'
@@ -22,7 +22,7 @@ gwb_layers = 5
 ot_layers = 50
 
 # alg. params
-size_batch = 250
+size_batch = 15
 epochs = 10
 lr = 0.25
 weight_decay = 0

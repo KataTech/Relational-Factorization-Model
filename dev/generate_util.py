@@ -89,23 +89,28 @@ def graph2text(graph_dict, name, del_existing = False):
         edge_f = open(filename_edges, "w"); graph_f = open(filename_graphs, "w"); label_f = open(filename_labels, "w")
 
         graph_idx = 0
+        node_offset = 0
         for label, graphs in graph_dict.items(): 
                 for adj_mat in graphs: 
                         # Document the label
                         label_f.write(f"{label}\n")
-                        # Extract the edges from the adjacency matrix 
+                        # Iterate through the nodes of the current graph
                         for i in range(adj_mat.shape[0]): 
+                                # document the graph type for the node
+                                graph_f.write(f"{graph_idx + 1}\n") # NOTE: indexing begin at 1 
+                                # Extract the edges from the adjacency matrix 
                                 for j in range(i + 1, adj_mat.shape[0]):
+                                        node_i = i + node_offset
+                                        node_j = j + node_offset
                                         # Check if (i, j) is an edge 
                                         if adj_mat[i, j] == 1: 
                                                 # document edges (both direction b/c undirected) 
-                                                edge_f.write(f"{i + 1}, {j + 1}\n")
-                                                edge_f.write(f"{j + 1}, {i + 1}\n")
-                                                # document the graph type for both edges
-                                                graph_f.write(f"{graph_idx + 1}\n") # NOTE: indexing begin at 1 
-                                                graph_f.write(f"{graph_idx + 1}\n") # NOTE: indexing begin at 1 
+                                                edge_f.write(f"{node_i + 1}, {node_j + 1}\n")
+                                                edge_f.write(f"{node_j + 1}, {node_i + 1}\n")
                         # Increment graph index
                         graph_idx += 1
+                        # Increment the node offset 
+                        node_offset += adj_mat.shape[0]
         
         # Close the files 
         edge_f.close(); graph_f.close(); label_f.close()

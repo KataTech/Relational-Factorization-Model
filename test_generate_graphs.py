@@ -3,7 +3,7 @@ from dev import generate_util as gen
 GENERATIVE_FUNCS = [gen.gen_cycle_graph, gen.gen_star_graph]
 MIN_NODE = 20
 MAX_NODE = 100
-NUM_GRAPHS = 500
+NUM_GRAPHS = 50
 PERMUTE = False 
 
 
