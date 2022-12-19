@@ -9,8 +9,7 @@ from sklearn.cluster import KMeans
 
 
 # data settings
-names = ['IMDB-MULTI']
-names = ['IMDB-BINARY']
+names = ['Cycles_and_Stars']
 
 
 # model params

@@ -2,7 +2,7 @@ import dev.util as util
 import os
 import pickle
 
-name_datasets = ['COLORS-3']  # util.navigate_child_dirs(util.DATA_GRAPH_DIR)
+name_datasets = ['Cycles_and_Stars']  # util.navigate_child_dirs(util.DATA_GRAPH_DIR)
 
 for name in name_datasets:
     filename_edges = os.path.join(util.DATA_GRAPH_DIR, name, '{}_A.txt'.format(name))

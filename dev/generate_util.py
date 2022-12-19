@@ -57,7 +57,7 @@ def random_generate(gen_funcs, max_nodes, num_graphs, permute = False):
                         i += 1
         return graphs 
 
-def graph2text(graph_dict, name): 
+def graph2text(graph_dict, name, del_existing = False): 
         """
         Given a graph dictionary, an output of random_generate(), writes text files corresponding to 
         the graphs described in the dictionary with format outlined by TUDataset. 
@@ -68,6 +68,7 @@ def graph2text(graph_dict, name):
                   to the class labels of the graphs, and the values correspond to a list storing 
                   adjacency matrices that represent graphs of the specified class 
                 - name [str]: the dataset name. 
+                - del_existing [bool]: determines if we delete existing files
         """
         
         # Set the file names 
@@ -79,8 +80,10 @@ def graph2text(graph_dict, name):
         # do nothing for this program. 
         file_exist = os.path.exists(filename_edges) or os.path.exists(filename_graphs) or os.path.exists(filename_labels)
         if file_exist: 
-                print("WARNING: Detecting at least one file corresponding to input name!")
-                return 
+                if not del_existing: 
+                        print("WARNING: Detecting at least one file corresponding to input name!")
+                        return 
+                os.remove(filename_edges); os.remove(filename_graphs); os.remove(filename_labels)
         
         # Open the files for write mode
         edge_f = open(filename_edges, "w"); graph_f = open(filename_graphs, "w"); label_f = open(filename_labels, "w")
@@ -88,16 +91,21 @@ def graph2text(graph_dict, name):
         graph_idx = 0
         for label, graphs in graph_dict.items(): 
                 for adj_mat in graphs: 
-                        # Document the label and graphID 
-                        graph_f.write(f"{graph_idx + 1}\n") # NOTE: indexing begin at 1 
+                        # Document the label
                         label_f.write(f"{label}\n")
                         # Extract the edges from the adjacency matrix 
                         for i in range(adj_mat.shape[0]): 
                                 for j in range(i + 1, adj_mat.shape[0]):
                                         # Check if (i, j) is an edge 
                                         if adj_mat[i, j] == 1: 
+                                                # document edges (both direction b/c undirected) 
                                                 edge_f.write(f"{i + 1}, {j + 1}\n")
                                                 edge_f.write(f"{j + 1}, {i + 1}\n")
+                                                # document the graph type for both edges
+                                                graph_f.write(f"{graph_idx + 1}\n") # NOTE: indexing begin at 1 
+                                                graph_f.write(f"{graph_idx + 1}\n") # NOTE: indexing begin at 1 
+                        # Increment graph index
+                        graph_idx += 1
         
         # Close the files 
         edge_f.close(); graph_f.close(); label_f.close()

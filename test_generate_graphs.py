@@ -21,8 +21,8 @@ PERMUTE = False
 #     print(val[1])
 #     print("----------------------------------------- \n")
 
-
+# Generate star and cycle graphs 
 graph_dict = gen.random_generate(GENERATIVE_FUNCS, MAX_NODE, NUM_GRAPHS, PERMUTE)
-gen.graph2text(graph_dict, "Cycles_and_Stars")
+gen.graph2text(graph_dict, "Cycles_and_Stars", del_existing = True)
 
 
