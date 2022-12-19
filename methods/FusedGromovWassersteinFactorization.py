@@ -103,6 +103,8 @@ class FGWF(nn.Module):
             self.embeddings = nn.ParameterList()
             base_label = []
             for k in range(self.num_atoms):
+                print("\nINDEX SAMPLES: ", index_samples)
+                print("K:", k, "\n")
                 idx = index_samples[k]
                 data = prior.__getitem__(idx)
                 graph = data[0]
@@ -343,7 +345,7 @@ def train_usl(model,
         print('{}: Epoch {}/{}, loss = {:.4f}, best loss = {:.4f}'.format(
             mode, epoch + 1, epochs, loss_epoch / num_samples, best_loss))
 
-        if visualize_prefix is not None:
+        if visualize_prefix is not None and epoch + 1 == epochs:
             embeddings = tsne_weights(model)
             index = list(range(num_samples))
             labels = []
