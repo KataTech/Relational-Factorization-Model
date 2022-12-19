@@ -11,6 +11,9 @@ DATA_POINT_DIR = "data/PointSets"
 MODEL_DIR = "models"
 RESULT_DIR = "results"
 
+# testing constants
+TEST_NAME = "TESTING"
+
 
 def navigate_child_dirs(path: str) -> list:
     """
