@@ -13,8 +13,8 @@ names = [util.TEST_NAME]
 
 
 # model params
-num_atoms = 2
-size_atoms = num_atoms * [20]
+num_atoms = 20
+size_atoms = num_atoms * [np.random.randint(20, 100)]
 ot_method = 'ppa'
 # ot_method = 'b-admm'
 gamma = 1e-1
@@ -22,7 +22,7 @@ gwb_layers = 5
 ot_layers = 50
 
 # alg. params
-size_batch = 15
+size_batch = 250
 epochs = 10
 lr = 0.25
 weight_decay = 0
