@@ -630,12 +630,12 @@ class GraphSampler(Dataset):
 
 
 class StructuralDataSampler(Dataset):
-    """Sampling point sets via minbatch"""
+    """Sampling point sets"""
 
     def __init__(self, data: List):
         """
         Args:
-            data: a list of data include [[edges, #nodes, (optional label)], ...]
+            data: a list of data include [[edges, nodes, label], ...]
         """
         self.data = data
 
@@ -643,6 +643,8 @@ class StructuralDataSampler(Dataset):
         return len(self.data)
 
     def __getitem__(self, idx):
+        
+        # populate idx-th graph attributes
         edges = self.data[idx][0]
         num_nodes = self.data[idx][1]
         adj = np.zeros((num_nodes, num_nodes))
@@ -653,6 +655,8 @@ class StructuralDataSampler(Dataset):
             dst = edge[1]
             adj[src, dst] = 1
 
+        # compute node features as uniform dist.
+        # if there aren't any
         if len(self.data[idx]) == 3:
             features = np.ones((num_nodes, 1))
             for edge in edges:
@@ -674,16 +678,17 @@ class StructuralDataSampler(Dataset):
 
 def structural_data_list(pkl_path: str):
     """
-    Split graph data into training and testing sets, the training sets can be unlabeled or partially labeled
-    Args:
-        pkl_path: the path of pkl file
-
+    Extract the graph data and number of classes from specified path of a pickle file. 
+    
     Returns:
-        training data, testing data, training labels
+        graph_data, num_class
+        where graph_data has N entries where the i-th entry is a list containing 
+            attributes of the i-th graph and num_class is the number of classes.
     """
     with open(pkl_path, 'rb') as f:
         data = pickle.load(f)
 
+    # verify whether the data contains graph features 
     if len(data) == 5:
         graph2edge = data[0]
         graph2size = data[1]
@@ -694,7 +699,6 @@ def structural_data_list(pkl_path: str):
         graph_data = []
         for i in range(len(graph2size)):
             graph_data.append([graph2edge[i], graph2size[i], graph2feature[i], graph2labels[i]])
-
     else:
         graph2edge = data[0]
         graph2size = data[1]
