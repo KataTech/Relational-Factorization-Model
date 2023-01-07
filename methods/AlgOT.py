@@ -1,3 +1,7 @@
+"""
+This script contains general algorithms for optimal transport. 
+"""
+
 import torch
 
 from typing import Tuple
