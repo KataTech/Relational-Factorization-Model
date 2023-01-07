@@ -3,10 +3,22 @@ import numpy as np
 import os
 import pickle
 
+# Process text files representing graphs in the format outlined by https://chrsmrrs.github.io/datasets/docs/format/
+
+# REQUIREMENTS: Every graph dataset must be stored in its own folder under the DATA_POINT_DIR directory
 name_datasets = util.navigate_child_dirs(util.DATA_POINT_DIR)
 
 for name in name_datasets:
+
+    # Let n = number of total nodes, m = number of total edges, N = number of total graphs. 
+
+    # <DATA>_A.txt: sparse adjacency matrix representation. Every line represents an edge 
+    # within a graph in the form of (node_id, node_id). 
+    # Line count: m, the total number of edges from  all the graphs in the dataset. 
     filename_edges = os.path.join(util.DATA_POINT_DIR, name, '{}_A.txt'.format(name))
+    # <DATA>_graph_indicator.txt: graph_id for every node_id. Indicates what graph a particular node_ID 
+    # represents. The numbering of node_ID does not restart for new graphs. 
+    # Line count: n, the total number of nodes from all the graphs in the dataset. 
     filename_graphs = os.path.join(util.DATA_POINT_DIR, name, '{}_graph_indicator.txt'.format(name))
     filename_labels = os.path.join(util.DATA_POINT_DIR, name, '{}_graph_labels.txt'.format(name))
     filename_nodes = os.path.join(util.DATA_POINT_DIR, name, '{}_node_attributes.txt'.format(name))
