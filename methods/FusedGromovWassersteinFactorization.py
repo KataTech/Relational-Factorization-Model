@@ -15,6 +15,10 @@ from typing import List, Tuple
 
 def fgwd(graph1, embedding1, prob1,
          graph2, embedding2, prob2, tran):
+    """
+    Computes the fused gromov-wasserstein distance between two graphs
+    given their embedding, distributions, and transport
+    """
     cost = cost_mat(graph1, graph2, prob1, prob2, tran, embedding1, embedding2)
     return (cost * tran).sum()
 
@@ -33,11 +37,14 @@ class FGWF(nn.Module):
                  gamma: float = 1e-1,
                  gwb_layers: int = 5,
                  ot_layers: int = 5,
-                 prior=None):
+                 prior=None, 
+                 verbose=False):
         """
         Args:
             num_samples: the number of samples
-            size_atoms: a list, its length is the number of atoms, each element is the size of the corresponding atom
+            num_classes: the number of classes
+            size_atoms: a list, its length is the number of atoms, 
+                        each element is the size of the corresponding atom
             dim_embedding: the dimension of embedding
             ot_method: ppa or b-admm
             gamma: the weight of Bregman divergence term
@@ -55,7 +62,7 @@ class FGWF(nn.Module):
         self.ot_layers = ot_layers
         self.gamma = gamma
 
-        # weights of atoms
+        # random initialization for the weights of the atoms
         self.weights = nn.Parameter(torch.randn(self.num_atoms, self.num_samples))
         self.softmax = nn.Softmax(dim=0)
 
@@ -67,6 +74,7 @@ class FGWF(nn.Module):
             for k in range(self.num_atoms):
                 atom = nn.Parameter(torch.randn(self.size_atoms[k], self.size_atoms[k]))
                 embedding = nn.Parameter(torch.randn(self.size_atoms[k], self.dim_embedding) / self.dim_embedding)
+                # since no prior, assume atoms have uniform distribution 
                 dist = torch.ones(self.size_atoms[k], 1) / self.size_atoms[k]  # .type(torch.FloatTensor)
                 self.ps.append(dist)
                 self.atoms.append(atom)
@@ -116,9 +124,9 @@ class FGWF(nn.Module):
                 self.atoms.append(atom)
                 self.embeddings.append(embedding)
                 base_label.append(gt[0])
-
-            print(self.size_atoms)
-            print(base_label)
+            if verbose: 
+                print(self.size_atoms)
+                print(base_label)
         self.sigmoid = nn.Sigmoid()
 
     def output_weights(self, idx: int = None):
@@ -203,7 +211,9 @@ def train_usl(model,
               shuffle_data: bool = True,
               zeta: float = None,
               mode: str = 'fit',
-              visualize_prefix: str = None):
+              visualize_prefix: str = None, 
+              verbose = False,
+              save = False):
     """
     training a FGWF model
     Args:
@@ -217,6 +227,8 @@ def train_usl(model,
         zeta: the weight of the regularizer enhancing the diversity of atoms
         mode: fit or transform
         visualize_prefix: display learning result after each epoch or not
+        verbose: display messages or not
+        save: whether or not to save the image figures
     """
     if mode == 'fit':
         optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
@@ -340,8 +352,9 @@ def train_usl(model,
             best_model = copy.deepcopy(model)
             best_loss = loss_epoch.data / num_samples
 
-        print('{}: Epoch {}/{}, loss = {:.4f}, best loss = {:.4f}'.format(
-            mode, epoch + 1, epochs, loss_epoch / num_samples, best_loss))
+        if verbose: 
+            print('{}: Epoch {}/{}, loss = {:.4f}, best loss = {:.4f}'.format(
+                mode, epoch + 1, epochs, loss_epoch / num_samples, best_loss))
 
         if visualize_prefix is not None and epoch + 1 == epochs:
             embeddings = tsne_weights(model)
@@ -359,8 +372,10 @@ def train_usl(model,
                             s=4,
                             label='class {}'.format(i + 1))
             plt.legend()
-            print('{}_usl_tsne_{}_{}.pdf'.format(visualize_prefix, mode, epoch+1))
-            plt.savefig('{}_usl_tsne_{}_{}.pdf'.format(visualize_prefix, mode, epoch+1))
+            if verbose: 
+                print('{}_usl_tsne_{}_{}.pdf'.format(visualize_prefix, mode, epoch+1))
+            if save: 
+                plt.savefig('{}_usl_tsne_{}_{}.pdf'.format(visualize_prefix, mode, epoch+1))
             plt.close()
     return best_model
 
@@ -375,7 +390,9 @@ def train_ssl(model,
               zeta: float = None,
               mode: str = 'fit',
               ssl: float = 0.1,
-              visualize_prefix: str = None):
+              visualize_prefix: str = None, 
+              verbose = False, 
+              save = False):
     """
     training a FGWF model
     Args:
@@ -390,6 +407,8 @@ def train_ssl(model,
         mode: fit or transform
         ssl: the percentage of labeled samples
         visualize_prefix: display learning result after each epoch or not
+        verbose: print debug messages or not
+        save: save figure or not
     """
     c = ['blue', 'orange', 'red', 'green', 'yellow', 'grey']
     train_graphs, test_graphs, train_labels, test_labels = structural_data_split(database, split_rate=ssl)
@@ -498,10 +517,11 @@ def train_ssl(model,
                 loss_epoch += loss_total
                 loss_total.backward()
                 optimizer.step()
-
-                print('-- {}/{} [{:.1f}%], loss={:.4f}, dgw={:.4f}, ssl={:.4f}, reg={:.4f}, time={:.2f}s.'.format(
-                    counts, num_samples, counts / num_samples * 100.0,
-                    loss_total / num, d_fgw_total / num, lle_total / num, reg_total / num, time.time() - t_start))
+                
+                if verbose: 
+                    print('-- {}/{} [{:.1f}%], loss={:.4f}, dgw={:.4f}, ssl={:.4f}, reg={:.4f}, time={:.2f}s.'.format(
+                        counts, num_samples, counts / num_samples * 100.0,
+                        loss_total / num, d_fgw_total / num, lle_total / num, reg_total / num, time.time() - t_start))
 
                 t_start = time.time()
                 loss_total = 0
@@ -528,8 +548,9 @@ def train_ssl(model,
             best_model = copy.deepcopy(model)
             best_predictor = copy.deepcopy(predictor)
 
-        print('{}: Epoch {}/{}, loss = {:.4f}, best acc = {:.4f}'.format(
-            mode, epoch + 1, epochs, loss_epoch / num_samples, best_acc))
+        if verbose: 
+            print('{}: Epoch {}/{}, loss = {:.4f}, best acc = {:.4f}'.format(
+                mode, epoch + 1, epochs, loss_epoch / num_samples, best_acc))
 
         if visualize_prefix is not None:
             embeddings = tsne_weights(model)
@@ -550,8 +571,10 @@ def train_ssl(model,
                             label='test class {}'.format(i + 1))
             plt.legend()
             plt.title('best acc = {:.4f}'.format(best_acc))
-            print('{}_ssl_tsne_{}_{}_{}.png'.format(visualize_prefix, len(train_graphs), mode, epoch+1))
-            plt.savefig('{}_ssl_tsne_{}_{}_{}.png'.format(visualize_prefix, len(train_graphs), mode, epoch+1))
+            if verbose: 
+                print('{}_ssl_tsne_{}_{}_{}.png'.format(visualize_prefix, len(train_graphs), mode, epoch+1))
+            if save: 
+                plt.savefig('{}_ssl_tsne_{}_{}_{}.png'.format(visualize_prefix, len(train_graphs), mode, epoch+1))
             plt.close()
     return best_model, best_predictor, best_acc
 
@@ -602,7 +625,7 @@ def load_model(model, full_path):
     return model
 
 
-def visualize_atoms(model, idx: int, threshold: float = 0.5, filename: str = None):
+def visualize_atoms(model, idx: int, threshold: float = 0.5, filename: str = None, save = False):
     """
     Learning the 2D embeddings of the atoms via multi-dimensional scaling (MDS)
     Args:
@@ -610,6 +633,7 @@ def visualize_atoms(model, idx: int, threshold: float = 0.5, filename: str = Non
         idx: an index of the atoms
         threshold: the threshold of edge
         filename: the prefix of image name
+        save: whether to save the image files
 
     Returns:
         embeddings: (size_atom, 2) matrix representing the embeddings of nodes/samples corresponding to the atom.
@@ -636,7 +660,8 @@ def visualize_atoms(model, idx: int, threshold: float = 0.5, filename: str = Non
                 y = emb[pair, 1]
                 plt.plot(x, y, 'r-')
 
-    if filename is None:
-        plt.savefig('atom_{}.pdf'.format(idx))
-    else:
-        plt.savefig('{}_{}.pdf'.format(filename, idx))
+    if save: 
+        if filename is None:
+            plt.savefig('atom_{}.pdf'.format(idx))
+        else:
+            plt.savefig('{}_{}.pdf'.format(filename, idx))
