@@ -11,6 +11,8 @@ def gen_cycle_graph(n: int, permute = False):
         for i in range(n - 1): 
                 adj_matrix[i, i + 1] = 1
                 adj_matrix[i + 1, i] = 1
+        adj_matrix[0, n - 1] = 1
+        adj_matrix[n - 1, 0] = 1
         return adj_matrix 
 
 def gen_star_graph(n: int, permute = False, verbose = False): 
