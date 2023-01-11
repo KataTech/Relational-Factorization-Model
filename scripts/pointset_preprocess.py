@@ -1,3 +1,8 @@
+# setting the path of this notebook to the root directory
+from constants import ROOT_DIR
+import sys
+sys.path.append(ROOT_DIR)
+
 import dev.util as util
 import numpy as np
 import os

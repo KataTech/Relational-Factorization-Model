@@ -2,6 +2,11 @@
 Compare different optimization algorithms for calculating Gromov-Wasserstein discrepancy
 """
 
+# setting the path of this notebook to the root directory
+from constants import ROOT_DIR
+import sys
+sys.path.append(ROOT_DIR)
+
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
