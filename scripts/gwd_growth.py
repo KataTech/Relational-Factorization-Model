@@ -15,8 +15,8 @@ import dev.generate_util as Gen
 sns.set()
 
 # set experiment parameters
-BASE_SIZES = [10, 25, 50, 100, 500]
-NUM_EXP = 100
+BASE_SIZES = [10, 25, 50, 100]
+NUM_EXP = 50
 COLORS = ["blue", "orange", "green", "red", "purple"]
 OUTER_ITER = 1000
 INNER_ITER = 10
