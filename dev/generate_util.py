@@ -3,6 +3,16 @@ import os
 from dev import util
 from collections import defaultdict
 
+def gen_line_graph(n: int, permute = False): 
+        """
+        Generates a matrix representing a line graph with "n" nodes
+        """
+        adj_matrix = np.zeros((n, n))
+        for i in range(n - 1): 
+                adj_matrix[i, i + 1] = 1
+                adj_matrix[i + 1, i] = 1
+        return adj_matrix 
+
 def gen_cycle_graph(n: int, permute = False): 
         """
         Generates a matrix representing a cycle graph with "n" nodes
