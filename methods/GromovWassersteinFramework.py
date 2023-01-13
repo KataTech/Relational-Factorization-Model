@@ -339,8 +339,8 @@ def node_cost_st(cost_s: csr_matrix, cost_t: csr_matrix,
 
         # f1_st = np.repeat(np.matmul(cost_s ** 2, p_s), n_t, axis=1)
         # f2_st = np.repeat(np.matmul(p_t.T, (cost_t ** 2).T), n_s, axis=0)
-        f1_st = np.repeat((cost_s ** 2) @ p_s, n_t, axis=1)
-        f2_st = np.repeat(((cost_t ** 2) @ p_t).T, n_s, axis=0)
+        f1_st = np.repeat((cost_s.toarray() ** 2) @ p_s, n_t, axis=1)
+        f2_st = np.repeat(((cost_t.toarray() ** 2) @ p_t).T, n_s, axis=0)
     else:
         # f1(a) = a*log(a) - a, f2(b) = b, h1(a) = a, h2(b) = log(b)
         # cost_st = f1(cost_s)*mu_s*1_nt^T + 1_ns*mu_t^T*f2(cost_t)^T
